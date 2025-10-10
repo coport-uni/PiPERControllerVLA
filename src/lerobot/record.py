@@ -180,8 +180,8 @@ class RecordConfig:
             self.policy = PreTrainedConfig.from_pretrained(policy_path, cli_overrides=cli_overrides)
             self.policy.pretrained_path = policy_path
 
-        if self.teleop is None and self.policy is None:
-            raise ValueError("Choose a policy, a teleoperator or both to control the robot")
+        # if self.teleop is None and self.policy is None:
+        #     raise ValueError("Choose a policy, a teleoperator or both to control the robot")
 
     @classmethod
     def __get_path_fields__(cls) -> list[str]:
@@ -268,17 +268,13 @@ def record_loop(
             base_action = robot._from_keyboard_to_base_action(keyboard_action)
 
             action = {**arm_action, **base_action} if len(base_action) > 0 else arm_action
-        else:
-            logging.info(
-                "No policy or teleoperator provided, skipping action generation."
-                "This is likely to happen when resetting the environment without a teleop device."
-                "The robot won't be at its rest position at the start of the next episode."
-            )
-            continue
+        # else:
+            # for the PiPER\
 
         # Action can eventually be clipped using `max_relative_target`,
         # so action actually sent is saved in the dataset.
-        sent_action = robot.send_action(action)
+        # sent_action = robot.send_action(action)
+        sent_action = observation
 
         if dataset is not None:
             action_frame = build_dataset_frame(dataset.features, sent_action, prefix="action")
@@ -286,7 +282,7 @@ def record_loop(
             dataset.add_frame(frame, task=single_task)
 
         if display_data:
-            log_rerun_data(observation, action)
+            log_rerun_data(observation)
 
         dt_s = time.perf_counter() - start_loop_t
         busy_wait(1 / fps - dt_s)
@@ -297,7 +293,7 @@ def record_loop(
 @parser.wrap()
 def record(cfg: RecordConfig) -> LeRobotDataset:
     init_logging()
-    logging.info(pformat(asdict(cfg)))
+    # logging.info(pformat(asdict(cfg)))
     if cfg.display_data:
         _init_rerun(session_name="recording")
 

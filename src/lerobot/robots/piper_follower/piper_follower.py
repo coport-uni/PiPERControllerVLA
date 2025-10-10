@@ -42,6 +42,7 @@ class PiperFollower(Robot):
     name = "piper_follower"
 
     def __init__(self, config: PiperFollowerConfig):
+        super().__init__(config)
         self.config = config
         self.id = config.id
         self.port = config.port

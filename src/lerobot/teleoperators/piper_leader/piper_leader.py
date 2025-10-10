@@ -38,6 +38,7 @@ class PiperLeader(Teleoperator):
     name = "piper_leader"
 
     def __init__(self, config: PiperLeaderConfig):
+        super().__init__(config)
         self.id = config.id
         self.port = config.port
         self.bus = PiperMotorsBus(
