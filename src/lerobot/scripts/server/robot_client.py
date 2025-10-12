@@ -182,6 +182,7 @@ class RobotClient:
         """Stop the robot client"""
         self.shutdown_event.set()
 
+        self.robot.parking()
         self.robot.disconnect()
         self.logger.debug("Robot disconnected")
 
