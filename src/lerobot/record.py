@@ -56,12 +56,10 @@ python -m lerobot.record \
   --dataset.single_task="Grab and handover the red cube to the other arm"
 ```
 """
-
 import logging
 import time
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from pathlib import Path
-from pprint import pformat
 
 from lerobot.cameras import (  # noqa: F401
     CameraConfig,  # noqa: F401
@@ -83,9 +81,9 @@ from lerobot.robots import (  # noqa: F401
     hope_jr,
     koch_follower,
     make_robot_from_config,
+    piper_follower,
     so100_follower,
     so101_follower,
-    piper_follower,
 )
 from lerobot.teleoperators import (  # noqa: F401
     Teleoperator,
@@ -94,9 +92,9 @@ from lerobot.teleoperators import (  # noqa: F401
     homunculus,
     koch_leader,
     make_teleoperator_from_config,
+    piper_leader,
     so100_leader,
     so101_leader,
-    piper_leader,
 )
 from lerobot.teleoperators.keyboard.teleop_keyboard import KeyboardTeleop
 from lerobot.utils.control_utils import (
@@ -268,13 +266,19 @@ def record_loop(
             base_action = robot._from_keyboard_to_base_action(keyboard_action)
 
             action = {**arm_action, **base_action} if len(base_action) > 0 else arm_action
-        # else:
-            # for the PiPER\
+        else:
+            logging.info(
+                "No policy or teleoperator provided, skipping action generation."
+                "This is likely to happen when resetting the environment without a teleop device."
+                "The robot won't be at its rest position at the start of the next episode."
+            )
+            continue
 
         # Action can eventually be clipped using `max_relative_target`,
         # so action actually sent is saved in the dataset.
-        # sent_action = robot.send_action(action)
-        sent_action = observation
+        print(action)
+        sent_action = robot.send_action(action)
+        print(sent_action)
 
         if dataset is not None:
             action_frame = build_dataset_frame(dataset.features, sent_action, prefix="action")
@@ -282,7 +286,7 @@ def record_loop(
             dataset.add_frame(frame, task=single_task)
 
         if display_data:
-            log_rerun_data(observation)
+            log_rerun_data(observation, action)
 
         dt_s = time.perf_counter() - start_loop_t
         busy_wait(1 / fps - dt_s)

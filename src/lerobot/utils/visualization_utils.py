@@ -28,7 +28,7 @@ def _init_rerun(session_name: str = "lerobot_control_loop") -> None:
     rr.spawn(memory_limit=memory_limit)
 
 
-def log_rerun_data(observation: dict[str | Any]):
+def log_rerun_data(observation: dict[str | Any], action: dict[str | Any]):
     for obs, val in observation.items():
         if isinstance(val, float):
             rr.log(f"observation.{obs}", rr.Scalar(val))
@@ -38,3 +38,9 @@ def log_rerun_data(observation: dict[str | Any]):
                     rr.log(f"observation.{obs}_{i}", rr.Scalar(float(v)))
             else:
                 rr.log(f"observation.{obs}", rr.Image(val), static=True)
+    for act, val in action.items():
+        if isinstance(val, float):
+            rr.log(f"action.{act}", rr.Scalar(val))
+        elif isinstance(val, np.ndarray):
+            for i, v in enumerate(val):
+                rr.log(f"action.{act}_{i}", rr.Scalar(float(v)))

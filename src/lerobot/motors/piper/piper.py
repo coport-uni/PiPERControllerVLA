@@ -15,22 +15,22 @@
 # limitations under the License.
 
 
-from ..motors_bus import Motor, MotorCalibration, MotorsBus, MotorNormMode, NameOrID, Value, get_address
-
-import time
 import logging
+import time
 from typing import Any
+
 # Import piper_sdk module
-from piper_sdk import *
+from piper_sdk import C_PiperInterface, C_PiperInterface_V2, LogLevel
 from wego_piper.port_handler import PortHandler
+
+from ..motors_bus import Motor, MotorCalibration, MotorNormMode, MotorsBus
 from .tables import (
-    AVAILABLE_BAUDRATES,
+    INITIALIZE_POSITION,
     MODEL_BAUDRATE_TABLE,
     MODEL_CONTROL_TABLE,
     MODEL_ENCODING_TABLE,
     MODEL_NUMBER_TABLE,
     MODEL_RESOLUTION_TABLE,
-    INITIALIZE_POSITION,
 )
 
 logger = logging.getLogger(__name__)
@@ -70,14 +70,14 @@ class PiperMotorsBus(MotorsBus):
 
     def _handshake(self):
         pass
-    
+
     def _find_single_motor(self, motor, initial_baudrate):
         pass
 
     def connect(self, handshake: bool = True) -> bool:
         self.port_handler.setupPort(self.piper)
         return self.port_handler.openPort()
-    
+
     def clear_gripper(self):
         self.piper.GripperCtrl(0, 1000, 0x03, 0)
 
@@ -198,19 +198,20 @@ class PiperMotorsBus(MotorsBus):
         }
         rlt = self._normalize(rlt)
         return rlt
-    
+
     def get_control(self) -> dict[str :Any]:
         msg_joint = self.piper.GetArmJointCtrl()
         msg_gripr = self.piper.GetArmGripperCtrl()
         rlt = {
-            "joint1"  : msg_joint.joint_ctrl.joint_1,
-            "joint2"  : msg_joint.joint_ctrl.joint_2,
-            "joint3"  : msg_joint.joint_ctrl.joint_3,
-            "joint4"  : msg_joint.joint_ctrl.joint_4,
-            "joint5"  : msg_joint.joint_ctrl.joint_5,
-            "joint6"  : msg_joint.joint_ctrl.joint_6,
-            "gripper" : msg_gripr.gripper_ctrl.grippers_angle,
+            "joint1"  : float(msg_joint.joint_ctrl.joint_1),
+            "joint2"  : float(msg_joint.joint_ctrl.joint_2),
+            "joint3"  : float(msg_joint.joint_ctrl.joint_3),
+            "joint4"  : float(msg_joint.joint_ctrl.joint_4),
+            "joint5"  : float(msg_joint.joint_ctrl.joint_5),
+            "joint6"  : float(msg_joint.joint_ctrl.joint_6),
+            "gripper" : float(msg_gripr.gripper_ctrl.grippers_angle),
         }
+        rlt = self._normalize(rlt)
         return rlt
 
     def set_action(self, action : dict[str, Any], is_conv : bool = True) -> dict[str, Any]:
@@ -218,12 +219,12 @@ class PiperMotorsBus(MotorsBus):
             action_denormalzed = self._unnormalize(action)
         else:
             action_denormalzed = action
-            
+
         self.piper.ModeCtrl(0x01, 0x01, 30, 0x00)
-        self.piper.JointCtrl( 
-            int(action_denormalzed["joint1"]), 
-            int(action_denormalzed["joint2"]), 
-            int(action_denormalzed["joint3"]), 
+        self.piper.JointCtrl(
+            int(action_denormalzed["joint1"]),
+            int(action_denormalzed["joint2"]),
+            int(action_denormalzed["joint3"]),
             int(action_denormalzed["joint4"]),
             int(action_denormalzed["joint5"]),
             int(action_denormalzed["joint6"]),
@@ -239,17 +240,14 @@ class PiperMotorsBus(MotorsBus):
 
     def _decode_sign(self, data_name: str, ids_values: dict[int, int]) -> dict[int, int]:
         return ids_values
-    
-    def _split_into_byte_chunks(self, value, length):
-        pass
 
-    def write_calibration(self, calibration_dict: dict[str, MotorCalibration], cache: bool = True) -> None:
+    def _split_into_byte_chunks(self, value, length):
         pass
 
     @property
     def is_calibrated(self) -> bool:
         return True
-    
+
     def set_slave(self):
         self.piper.MasterSlaveConfig(0xFC, 0, 0, 0)
 
@@ -269,18 +267,18 @@ class PiperMotorsBus(MotorsBus):
 if __name__ == "__main__":
     # Instantiate interface, the default parameters of the parameters are as follows
     #   can_name(str): can port name
-    #   judge_flag(bool): Whether to enable the can module when creating this instance. 
+    #   judge_flag(bool): Whether to enable the can module when creating this instance.
     #                     If you use an unofficial module, please set it to False
-    #   can_auto_init(bool): Whether to automatically initialize to open the can bus when creating this instance. 
+    #   can_auto_init(bool): Whether to automatically initialize to open the can bus when creating this instance.
     #                        If set to False, please set the can_init parameter to True in the ConnectPort parameter
-    #   dh_is_offset([0,1] -> default 0x01): Whether the dh parameter used is the new version of dh or the old version of dh. 
+    #   dh_is_offset([0,1] -> default 0x01): Whether the dh parameter used is the new version of dh or the old version of dh.
     #                                       The old version is before S-V1.6-3, and the new version is after S-V1.6-3 firmware
     #           0 -> old
     #           1 -> new
     #   start_sdk_joint_limit(bool -> False): Whether to enable SDK joint angle limit, which will limit both feedback and control messages
     #   start_sdk_gripper_limit(bool -> False): Whether to enable SDK gripper position limit, which will limit both feedback and control messages
     #   logger_level(LogLevel -> default LogLevel.WARNING): Set the log level
-    #         The following parameters are optional: 
+    #         The following parameters are optional:
     #               LogLevel.DEBUG
     #               LogLevel.INFO
     #               LogLevel.WARNING

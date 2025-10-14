@@ -14,17 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import builtins
-from pathlib import Path
-from typing import Any
 import logging
 import time
+from pathlib import Path
+from typing import Any
 
-import draccus
-
-from lerobot.errors import DeviceAlreadyConnectedError, DeviceNotConnectedError
 from lerobot.constants import HF_LEROBOT_CALIBRATION, TELEOPERATORS
-from lerobot.motors import Motor, MotorNormMode
+from lerobot.errors import DeviceNotConnectedError
+from lerobot.motors import Motor, MotorCalibration, MotorNormMode
 
 from ...motors.piper import PiperMotorsBus
 from ..teleoperator import Teleoperator
@@ -33,25 +30,34 @@ from .config_piper_leader import PiperLeaderConfig
 logger = logging.getLogger(__name__)
 
 class PiperLeader(Teleoperator):
-
     config_class = PiperLeaderConfig
     name = "piper_leader"
 
     def __init__(self, config: PiperLeaderConfig):
         super().__init__(config)
+        self.config = config
         self.id = config.id
         self.port = config.port
         self.bus = PiperMotorsBus(
             id=config.id,
             port=config.port,
             motors={
-                "joint1": Motor(1, "HTDW-5047", MotorNormMode.RANGE_M100_100),
-                "joint2": Motor(2, "HTDW-5047", MotorNormMode.RANGE_M100_100),
-                "joint3": Motor(3, "HTDW-5047", MotorNormMode.RANGE_M100_100),
-                "joint4": Motor(4, "HTDW-5047", MotorNormMode.RANGE_M100_100),
-                "joint5": Motor(5, "HTDW-5047", MotorNormMode.RANGE_M100_100),
-                "joint6": Motor(6, "HTDW-5047", MotorNormMode.RANGE_M100_100),
-                "gripper": Motor(7, "HTDW-5047", MotorNormMode.RANGE_0_100),
+                "joint1": Motor(1, "AGILEX-M", MotorNormMode.RANGE_M100_100),
+                "joint2": Motor(2, "AGILEX-M", MotorNormMode.RANGE_M100_100),
+                "joint3": Motor(3, "AGILEX-M", MotorNormMode.RANGE_M100_100),
+                "joint4": Motor(4, "AGILEX-S", MotorNormMode.RANGE_M100_100),
+                "joint5": Motor(5, "AGILEX-S", MotorNormMode.RANGE_M100_100),
+                "joint6": Motor(6, "AGILEX-S", MotorNormMode.RANGE_M100_100),
+                "gripper": Motor(7, "AGILEX-S", MotorNormMode.RANGE_0_100),
+            },
+            calibration={
+                "joint1": MotorCalibration(1, 0, 0, -150000, 150000),
+                "joint2": MotorCalibration(2, 0, 0,       0, 180000),
+                "joint3": MotorCalibration(3, 0, 0, -170000, 0     ),
+                "joint4": MotorCalibration(4, 0, 0, -100000, 100000),
+                "joint5": MotorCalibration(5, 0, 0,  -65000, 65000 ),
+                "joint6": MotorCalibration(6, 0, 0, -100000, 130000),
+                "gripper": MotorCalibration(7, 0, 0, 0, 68000),
             }
         )
 
@@ -101,7 +107,7 @@ class PiperLeader(Teleoperator):
     def get_action(self) -> dict[str, Any]:
         if not self.is_connected:
             raise DeviceNotConnectedError(f"{self} is not connected.")
-        return self.bus.get_action()
+        return self.bus.get_control()
 
     def send_feedback(self, feedback: dict[str, Any]) -> None:
         pass

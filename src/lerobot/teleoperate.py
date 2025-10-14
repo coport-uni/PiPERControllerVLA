@@ -68,6 +68,7 @@ from lerobot.robots import (  # noqa: F401
     hope_jr,
     koch_follower,
     make_robot_from_config,
+    piper_follower,
     so100_follower,
     so101_follower,
 )
@@ -79,6 +80,7 @@ from lerobot.teleoperators import (  # noqa: F401
     homunculus,
     koch_leader,
     make_teleoperator_from_config,
+    piper_leader,
     so100_leader,
     so101_leader,
 )
@@ -104,9 +106,13 @@ def teleop_loop(
 ):
     display_len = max(len(key) for key in robot.action_features)
     start = time.perf_counter()
+    action = {}
     while True:
         loop_start = time.perf_counter()
         action = teleop.get_action()
+        # logging.info("getting action")
+        # print(action)
+
         if display_data:
             observation = robot.get_observation()
             log_rerun_data(observation, action)

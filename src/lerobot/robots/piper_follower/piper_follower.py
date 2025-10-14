@@ -14,19 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import builtins
 import logging
 import time
-from pathlib import Path
 from functools import cached_property
+from pathlib import Path
 from typing import Any
-
-import draccus
 
 from lerobot.cameras.utils import make_cameras_from_configs
 from lerobot.constants import HF_LEROBOT_CALIBRATION, ROBOTS
-from lerobot.errors import DeviceAlreadyConnectedError, DeviceNotConnectedError
-from lerobot.motors import Motor, MotorNormMode, MotorCalibration
+from lerobot.errors import DeviceNotConnectedError
+from lerobot.motors import Motor, MotorCalibration, MotorNormMode
 
 from ...motors.piper import PiperMotorsBus
 from ..robot import Robot
@@ -156,8 +153,9 @@ class PiperFollower(Robot):
     def send_action(self, action: dict[str, Any], is_conv : bool = True) -> dict[str, Any]:
         if not self.is_connected:
             raise DeviceNotConnectedError(f"{self} is not connected.")
-        
+
         goal_pos = {key.removesuffix(".pos"): val for key, val in action.items() if key.endswith(".pos")}
+        goal_pos = action
 
         # Cap goal position when too far away from present position.
         # /!\ Slower fps expected due to reading from the follower.
@@ -166,10 +164,9 @@ class PiperFollower(Robot):
             goal_present_pos = {key: (g_pos, present_pos[key]) for key, g_pos in goal_pos.items()}
             goal_pos = ensure_safe_goal_position(goal_present_pos, self.config.max_relative_target)
 
-        rlt = self.bus.set_action(goal_pos, is_conv)
+        self.bus.set_action(goal_pos, is_conv)
+        return {f"{motor}.pos": val for motor, val in goal_pos.items()}
 
-        return {f"{motor}.pos": val for motor, val in rlt.items()}
-    
     def parking(self):
         self.bus.parking()
 
