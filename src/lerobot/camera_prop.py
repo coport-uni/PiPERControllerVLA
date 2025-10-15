@@ -27,6 +27,7 @@ class CameraConfig:
     mode : float = 0.0
     fps : float = 30.0
     hue : float = 0.0
+    brightness : float = 0.0
 
 @dataclass
 class ProgramConfig:
@@ -58,6 +59,7 @@ class CameraCon:
         self.current.mode = self.cap.get(cv2.CAP_PROP_MODE)
         self.current.fps = self.cap.get(cv2.CAP_PROP_FPS)
         self.current.hue = self.cap.get(cv2.CAP_PROP_HUE)
+        self.current.brightness = self.cap.get(cv2.CAP_PROP_BRIGHTNESS)
 
     def _increase(self, target, step = 1):
         self.cap.set(target, self.cap.get(target) + step)
@@ -81,6 +83,7 @@ class CameraCon:
         self.cap.set(cv2.CAP_PROP_MODE, cfg.mode)
         self.cap.set(cv2.CAP_PROP_FPS, cfg.fps)
         self.cap.set(cv2.CAP_PROP_HUE, cfg.hue)
+        self.cap.set(cv2.CAP_PROP_BRIGHTNESS, cfg.brightness)
 
     def display_config(self):
         table = Table(title=f"Camera Config for '{self.config.path_or_index}'")
@@ -97,6 +100,7 @@ class CameraCon:
         table.add_row("Mode", str(self.current.mode))
         table.add_row("FPS", str(self.current.fps))
         table.add_row("Hue", str(self.current.hue))
+        table.add_row("Brightness", str(self.current.brightness))
         return table
 
 def proc_usercon(cams : list[CameraCon]):
@@ -125,6 +129,7 @@ def proc_usercon(cams : list[CameraCon]):
 
     def video_stream():
         cam = cams[cam_idx]
+        root.title(cam.config.path_or_index)
         _, frame = cam.read()
         cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
         img = Image.fromarray(cv2image)
@@ -162,7 +167,6 @@ def proc_usercon(cams : list[CameraCon]):
             # This is a heuristic and might not perfectly match camera's exposure setting
             exposure_estimate = (hist_r.std() + hist_g.std() + hist_b.std()) / 3
             table.add_row("Exposure Estimate (Std Dev)", f"{exposure_estimate:.2f}")
-
             return table
 
         cam.get_property()
@@ -201,6 +205,10 @@ def proc_usercon(cams : list[CameraCon]):
                 cam._increase(cv2.CAP_PROP_HUE)
             case 'h':
                 cam._decrease(cv2.CAP_PROP_HUE)
+            case 'b':
+                cam._increase(cv2.CAP_PROP_BRIGHTNESS)
+            case 'n':
+                cam._decrease(cv2.CAP_PROP_BRIGHTNESS)
             case 'x':
                 root.destroy()
             case '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9':
