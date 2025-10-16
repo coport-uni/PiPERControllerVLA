@@ -16,7 +16,7 @@ python ./src/lerobot/record.py \
 --teleop.id=blue \
 --display_data=true   \
 --dataset.repo_id=wego-hansu/piper_tele_pick_cars_033_B  \
---dataset.num_episodes=5  \
+--dataset.num_episodes=50  \
 --dataset.single_task="Pick the car and put in the box" \
---resume=false \
+--resume=true \
     # front: {type: opencv, index_or_path: '/dev/video4', width: 640, height: 480, fps: 30}}" \
