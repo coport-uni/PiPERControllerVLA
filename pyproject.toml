@@ -87,6 +87,8 @@ dependencies = [
     "flask>=3.0.3,<4.0.0",
     "imageio[ffmpeg]>=2.34.0,<3.0.0",
     "termcolor>=2.4.0,<4.0.0",
+    "piper-sdk>=0.4.1",
+    "wego-piper>=0.0.2"
 ]
 
 # Optional dependencies
@@ -101,7 +103,6 @@ grpcio-dep = ["grpcio==1.73.1", "protobuf==6.31.0"]
 # Motors
 feetech = ["feetech-servo-sdk>=1.0.0"]
 dynamixel = ["dynamixel-sdk>=3.7.31"]
-piper = ["piper-sdk>=0.4.1", "wego-piper>=0.0.2"]
 
 # Robots
 gamepad = ["lerobot[pygame-dep]", "hidapi>=0.14.0"]
@@ -266,7 +267,7 @@ default.extend-ignore-identifiers-re = [
 # ignore_missing_imports = false
 
 [tool.poetry]
-name = "lerobot"
+name = "lerobot-piper"
 version = "0.0.1"
 description = "For WEGO PiPEER"
 authors = ["sw.han <sw.han@wego-robotics.com>"]
