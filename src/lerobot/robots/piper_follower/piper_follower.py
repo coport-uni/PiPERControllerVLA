@@ -103,7 +103,7 @@ class PiperFollower(Robot):
             return False
         logger.info(f"{self} connected.")
         while not self.bus.enable_torque():
-            logger.info(f"{self} retry torque on.")    
+            logger.info(f"{self} retry torque on.")
         if calibrate:
             logger.info(f"{self} go to origin.")
             self.bus.parking()
@@ -119,7 +119,7 @@ class PiperFollower(Robot):
     def calibrate(self) -> None:
         self.bus.clear_gripper()
         return True
-    
+
     def _load_calibration(self, fpath: Path | None = None) -> None:
         pass
 

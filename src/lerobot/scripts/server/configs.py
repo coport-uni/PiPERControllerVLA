@@ -23,6 +23,7 @@ from lerobot.scripts.server.constants import (
     DEFAULT_INFERENCE_LATENCY,
     DEFAULT_OBS_QUEUE_TIMEOUT,
 )
+from lerobot.teleoperators.config import TeleoperatorConfig
 
 # Aggregate function registry for CLI usage
 AGGREGATE_FUNCTIONS = {
@@ -112,6 +113,9 @@ class RobotClientConfig:
 
     # Robot configuration (for CLI usage - robot instance will be created from this)
     robot: RobotConfig = field(metadata={"help": "Robot configuration"})
+    teleop: TeleoperatorConfig = field(metadata={"help": "Teleoperator configuration"})
+
+    # Action chunking configuration
 
     # Policies typically output K actions at max, but we can use less to avoid wasting bandwidth (as actions
     # would be aggregated on the client side anyway, depending on the value of `chunk_size_threshold`)

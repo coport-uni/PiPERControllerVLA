@@ -81,6 +81,7 @@ class PolicyServer(services_pb2_grpc.AsyncInferenceServicer):
         self.lerobot_features = None
         self.actions_per_chunk = None
         self.policy = None
+        self.pretrained_name_or_path = None
 
     @property
     def running(self):
@@ -140,14 +141,18 @@ class PolicyServer(services_pb2_grpc.AsyncInferenceServicer):
         self.lerobot_features = policy_specs.lerobot_features
         self.actions_per_chunk = policy_specs.actions_per_chunk
 
-        policy_class = get_policy_class(self.policy_type)
+        if self.pretrained_name_or_path != policy_specs.pretrained_name_or_path:
+            self.pretrained_name_or_path = policy_specs.pretrained_name_or_path
+            policy_class = get_policy_class(self.policy_type)
 
-        start = time.perf_counter()
-        self.policy = policy_class.from_pretrained(policy_specs.pretrained_name_or_path)
-        self.policy.to(self.device)
-        end = time.perf_counter()
+            start = time.perf_counter()
+            self.policy = policy_class.from_pretrained(policy_specs.pretrained_name_or_path)
+            self.policy.to(self.device)
+            end = time.perf_counter()
 
-        self.logger.info(f"Time taken to put policy on {self.device}: {end - start:.4f} seconds")
+            self.logger.info(f"Time taken to put policy on {self.device}: {end - start:.4f} seconds")
+        else:
+            self.logger.info("Same Policy!")
 
         return services_pb2.Empty()
 

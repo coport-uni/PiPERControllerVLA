@@ -109,6 +109,9 @@ class PiperLeader(Teleoperator):
             raise DeviceNotConnectedError(f"{self} is not connected.")
         return self.bus.get_control()
 
+    def is_protected(self) -> bool:
+        return False
+
     def send_feedback(self, feedback: dict[str, Any]) -> None:
         pass
 

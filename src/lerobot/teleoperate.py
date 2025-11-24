@@ -55,6 +55,8 @@ import logging
 import time
 from dataclasses import asdict, dataclass
 from pprint import pformat
+from lerobot.motors.piper import PiperMotorsBus
+from piper_sdk import C_PiperInterface_V2
 
 import draccus
 import rerun as rr
@@ -104,6 +106,8 @@ class TeleoperateConfig:
 def teleop_loop(
     teleop: Teleoperator, robot: Robot, fps: int, display_data: bool = False, duration: float | None = None
 ):
+    piper : C_PiperInterface_V2 = robot.bus.piper
+    bus : PiperMotorsBus = robot.bus
     display_len = max(len(key) for key in robot.action_features)
     start = time.perf_counter()
     action = {}
@@ -117,17 +121,24 @@ def teleop_loop(
             observation = robot.get_observation()
             log_rerun_data(observation, action)
 
-        robot.send_action(action)
+        try:
+            robot.send_action(action)
+        except Exception as e:
+            print(e)
+            piper.MotionCtrl_1(0x01,0,0)  # Stop
+            piper.MotionCtrl_1(0x02,0,0)  # Reset
+            bus.parking()
+
         dt_s = time.perf_counter() - loop_start
         busy_wait(1 / fps - dt_s)
 
         loop_s = time.perf_counter() - loop_start
 
-        print("\n" + "-" * (display_len + 10))
-        print(f"{'NAME':<{display_len}} | {'NORM':>7}")
-        for motor, value in action.items():
-            print(f"{motor:<{display_len}} | {value:>7.2f}")
-        print(f"\ntime: {loop_s * 1e3:.2f}ms ({1 / loop_s:.0f} Hz)")
+        # print("\n" + "-" * (display_len + 10))
+        # print(f"{'NAME':<{display_len}} | {'NORM':>7}")
+        # for motor, value in action.items():
+        #     print(f"{motor:<{display_len}} | {value:>7.2f}")
+        # print(f"\ntime: {loop_s * 1e3:.2f}ms ({1 / loop_s:.0f} Hz)")
 
         if duration is not None and time.perf_counter() - start >= duration:
             return
