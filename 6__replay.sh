@@ -8,5 +8,5 @@ lerobot-replay \
 --robot.type=piper_follower \
 --robot.port=can_follower \
 --robot.id=black \
---dataset.repo_id=${HF_USER}/piper_pick_yellow_car \
---dataset.episode=0
+--dataset.repo_id=coport-uni/piper-test8 \
+--dataset.episode=4

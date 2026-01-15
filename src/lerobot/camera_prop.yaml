@@ -9,7 +9,7 @@ camera_setting:
   gain: 20.0
   hue: -1.0
   mode: 0.0
-  path_or_index: /dev/video4
+  path_or_index: /dev/video1
   temperature: 6000.0
   zoom: -1.0
 - auto_exposure: 1.0
@@ -22,6 +22,6 @@ camera_setting:
   gain: 20.0
   hue: -1.0
   mode: 0.0
-  path_or_index: /dev/video12
+  path_or_index: /dev/video3
   temperature: 6000.0
   zoom: -1.0
