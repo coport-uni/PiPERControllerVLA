@@ -5,6 +5,7 @@ HF_USER=$(hf auth whoami | head -n 1)
 echo $HF_USER
 
 python ./src/lerobot/record.py \
+--dataset.root="/home/sungwoo/workspace/lerobot/lerobot_piper/outputs/Datasets//PiPER_pick_black_colored_marker_to_box" \
 --robot.type=piper_follower \
 --robot.port=can_follower \
 --robot.cameras="{ \
@@ -15,9 +16,10 @@ python ./src/lerobot/record.py \
 --teleop.port=can_leader \
 --teleop.id=blue \
 --display_data=true   \
---dataset.repo_id=coport-uni/piper-test8  \
+--dataset.repo_id=coport-uni/PiPER_pick_black_colored_marker_to_box  \
 --dataset.episode_time_s=20  \
 --dataset.reset_time_s=15  \
---dataset.num_episodes=5  \
---dataset.single_task="Pick the white block and put in the box" 
+--dataset.num_episodes=15  \
+--dataset.single_task="Pick the black colored marker and put in the box" \
+--resume=true
     # front: {type: opencv, index_or_path: '/dev/video4', width: 640, height: 480, fps: 30}}" \
