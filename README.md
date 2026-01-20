@@ -20,6 +20,7 @@ conda install ffmpeg -c conda-forge
 sudo apt-get install cmake build-essential python3-dev pkg-config libavformat-dev libavcodec-dev libavdevice-dev libavutil-dev libswscale-dev libswresample-dev libavfilter-dev
 pip install -e .
 pip install lerobot[all]  rich
+pip install --upgrade wandb
 hf auth login
 wandb login
 ```
