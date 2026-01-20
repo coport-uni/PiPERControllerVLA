@@ -68,7 +68,7 @@ class RobotClient(object):
         { 'trigger' : 'start_teleop', 'source' : 'Waiting', 'dest' : 'TeleopMode' },
         { 'trigger' : 'enter_safe', 'source' : ['AsyncMode', 'SyncMode', 'ManualMode', 'TeachMode', 'TeleopMode'], 'dest' : 'SafeMode' },
         { 'trigger' : 'exit_safe', 'source' : 'SafeMode', 'dest' : 'Waiting' },
-        { 'trigger' : 'reset', 'source' : 'SafeMode', 'dest' : 'Waiting' },
+        { 'trigger' : 'reset', 'source' : 'SNoneafeMode', 'dest' : 'Waiting' },
         { 'trigger' : 'shutdown', 'source' : ['SafeMode', 'Waiting'], 'dest' : '*' },
         { 'trigger' : 'stop', 'source' : ['AsyncMode', 'SyncMode', 'ManualMode', 'TeachMode', 'TeleopMode'], 'dest' : 'Waiting' },
     ]

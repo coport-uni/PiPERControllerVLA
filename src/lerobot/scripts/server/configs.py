@@ -113,7 +113,7 @@ class RobotClientConfig:
 
     # Robot configuration (for CLI usage - robot instance will be created from this)
     robot: RobotConfig = field(metadata={"help": "Robot configuration"})
-    teleop: TeleoperatorConfig = field(metadata={"help": "Teleoperator configuration"})
+    # teleop: TeleoperatorConfig = field(metadata={"help": "Teleoperator configuration"})
 
     # Action chunking configuration
 
