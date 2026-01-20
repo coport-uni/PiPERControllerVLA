@@ -36,6 +36,7 @@ from queue import Empty, Queue
 import draccus
 import grpc
 import torch
+import os
 
 from lerobot.policies.factory import get_policy_class
 from lerobot.scripts.server.configs import PolicyServerConfig
@@ -56,6 +57,8 @@ from lerobot.transport import (
 )
 from lerobot.transport.utils import receive_bytes_in_chunks
 
+# Inference setting
+os.environ["CUDA_VISIBLE_DEVICES"] = "1" 
 
 class PolicyServer(services_pb2_grpc.AsyncInferenceServicer):
     prefix = "policy_server"
@@ -76,7 +79,7 @@ class PolicyServer(services_pb2_grpc.AsyncInferenceServicer):
         self.last_processed_obs = None
 
         # Attributes will be set by SendPolicyInstructions
-        self.device = None
+        self.device = "cuda"
         self.policy_type = None
         self.lerobot_features = None
         self.actions_per_chunk = None
