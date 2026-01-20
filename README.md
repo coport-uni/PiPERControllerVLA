@@ -16,10 +16,10 @@ conda -V
 git clone ``
 conda create -n lerobot python=3.10
 conda activate lerobot
-conda install ffmpeg -c conda-forge
+conda install -c conda-forge ffmpeg
 sudo apt-get install cmake build-essential python3-dev pkg-config libavformat-dev libavcodec-dev libavdevice-dev libavutil-dev libswscale-dev libswresample-dev libavfilter-dev
 pip install -e .
-pip install lerobot[all]  rich
+pip install lerobot[all]  rich protobuf==6.33.4
 hf auth login
 wandb login
 ```
