@@ -6,4 +6,4 @@ conda activate lerobot
 # echo $HF_USER
 
 huggingface-cli upload coport-uni/piper_90k \
-  /workspace/VLARelated/PiPERControllerVLA/outputs/train/piper_act_test1/checkpoints/090000/pretrained_model
+  /workspace/VLARelated/PiPERControllerVLA/outputs/train/piper_act_test1/checkpoints/095000/pretrained_model
